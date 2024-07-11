@@ -16,12 +16,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileupload());
 app.use(cookieParser());
+// app.use(
+//   cors({
+//     origin: "https://yourfrontend.com", // Adjust this to match your client's URL.
+//     credentials: true, // Allows cookies to be sent with requests.
+//   })
+// );
+
+
 app.use(
   cors({
-    origin: "https://yourfrontend.com", // Adjust this to match your client's URL.
-    credentials: true, // Allows cookies to be sent with requests.
+    origin: "https://chatter-box-inky.vercel.app", // The actual URL of your frontend
+    credentials: true,
   })
 );
+
 const server = http.createServer(app);
 
 // Routes
