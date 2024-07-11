@@ -7,7 +7,7 @@ import axios from "axios";
 import moment from "moment"; // Import moment
 import { v4 as uuidv4 } from "uuid"; // Ensure you have uuid installed
 // const socket = io("http://localhost:4004");
-const socket = io()
+const socket = io();
 
 function ChatRoom() {
   const navigate = useNavigate();
