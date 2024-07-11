@@ -9,7 +9,6 @@ const fileupload = require("express-fileupload");
 const bodyParser = require("body-parser");
 const http = require("http");
 
-// Connect to the database
 connectDB();
 console.log(process.env.PORT);
 const app = express();
