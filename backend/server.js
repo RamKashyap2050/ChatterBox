@@ -29,17 +29,16 @@ const server = http.createServer(app);
 app.use("/Users", require("./routes/UserRoutes"));
 app.use("/Chats", require("./routes/chatRoomRoutes"));
 
-// Static files for production
-// if (process.env.NODE_ENV === "dev") {
-//   app.use(express.static(path.join(__dirname, "../frontend/build")));
-//   app.get("*", (req, res) => {
-//     res.sendFile(
-//       path.resolve(__dirname, "../", "frontend", "build", "index.html")
-//     );
-//   });
-// } else {
-//   app.get("/", (req, res) => res.send("API is running..."));
-// }
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(
+      path.resolve(__dirname, "../", "frontend", "build", "index.html")
+    );
+  });
+} else {
+  app.get("/", (req, res) => res.send("API is running..."));
+}
 
 // Socket.io setup
 const io = require("socket.io")(server, {
