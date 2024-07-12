@@ -50,6 +50,7 @@ if (process.env.NODE_ENV === "production") {
 
 // Socket.io setup
 const io = require("socket.io")(server, {
+  path: "/socket.io/",
   cors: {
     origin: "https://chatter-box-inky.vercel.app", // Adjust for your frontend host
     methods: ["GET", "POST"],
