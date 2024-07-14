@@ -24,12 +24,18 @@ app.use(cookieParser());
 // );
 
 
-app.use(
-  cors({
-    origin: "https://chatter-box-inky.vercel.app", // The actual URL of your frontend
-    credentials: true,
-  })
-);
+const allowedOrigins = ['https://chatter-box-inky.vercel.app', 'http://localhost:3000'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // Allow the request if no origin or if it's from an allowed origin
+    } else {
+      callback(new Error('Not allowed by CORS')); // Block the request if it's not from an allowed origin
+    }
+  },
+  credentials: true
+}));
 
 const server = http.createServer(app);
 
@@ -52,7 +58,7 @@ if (process.env.NODE_ENV === "production") {
 const io = require("socket.io")(server, {
   path: "/socket.io/",
   cors: {
-    origin: "https://chatter-box-inky.vercel.app", // Adjust for your frontend host
+    origin: ["https://chatter-box-inky.vercel.app", "http://localhost:3000"], // List all frontend URLs
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -78,10 +84,9 @@ io.on("connection", (socket) => {
 
     try {
       const savedMessage = await message.save();
-      // Populate the sender data before sending the message to all clients
       const populatedMessage = await Message.findById(
         savedMessage._id
-      ).populate("sender", "name email _id"); // Adjust according to what sender info you need
+      ).populate("sender", "name email _id"); 
 
       io.to(chatRoomId).emit("newMessage", populatedMessage);
     } catch (error) {
