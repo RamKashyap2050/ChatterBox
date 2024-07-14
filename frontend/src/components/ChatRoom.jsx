@@ -6,8 +6,12 @@ import io from "socket.io-client";
 import axios from "axios";
 import moment from "moment"; // Import moment
 import { v4 as uuidv4 } from "uuid"; // Ensure you have uuid installed
-const socket = io("http://localhost:4004");
-// const socket = io("/", { path: "/socket.io/" });
+// Determine the base URL based on the environment
+const BASE_URL = process.env.NODE_ENV === 'production'
+  ? window.location.origin  // Use the current host in production
+  : 'http://localhost:4004'; // Use localhost for development
+
+const socket = io(BASE_URL, { path: "/socket.io/" });
 
 function ChatRoom() {
   const navigate = useNavigate();

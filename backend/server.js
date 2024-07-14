@@ -17,12 +17,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileupload());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: "https://localhost:3000", // Adjust this to match your client's URL.
-    credentials: true, // Allows cookies to be sent with requests.
-  })
-);
+// Configure CORS
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? "https://chatterboxr-43d5e127a37c.herokuapp.com" // Replace with your frontend URL
+    : "http://localhost:3000",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 const server = http.createServer(app);
 
 // Routes
@@ -41,9 +43,12 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Socket.io setup
+// Socket.io setup
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000", // Adjust for your frontend host
+    origin: process.env.NODE_ENV === 'production'
+      ? "https://chatterboxr-43d5e127a37c.herokuapp.com"  // Adjust for production URL
+      : "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true,
   },
