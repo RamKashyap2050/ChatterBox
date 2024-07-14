@@ -9,6 +9,7 @@ const fileupload = require("express-fileupload");
 const bodyParser = require("body-parser");
 const http = require("http");
 
+// Connect to the database
 connectDB();
 console.log(process.env.PORT);
 const app = express();
@@ -16,27 +17,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileupload());
 app.use(cookieParser());
-// app.use(
-//   cors({
-//     origin: "https://yourfrontend.com", // Adjust this to match your client's URL.
-//     credentials: true, // Allows cookies to be sent with requests.
-//   })
-// );
-
-
-const allowedOrigins = ['https://chatter-box-inky.vercel.app', 'http://localhost:3000'];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true); // Allow the request if no origin or if it's from an allowed origin
-    } else {
-      callback(new Error('Not allowed by CORS')); // Block the request if it's not from an allowed origin
-    }
-  },
-  credentials: true
-}));
-
+app.use(
+  cors({
+    origin: "https://localhost:3000", // Adjust this to match your client's URL.
+    credentials: true, // Allows cookies to be sent with requests.
+  })
+);
 const server = http.createServer(app);
 
 // Routes
@@ -56,9 +42,8 @@ if (process.env.NODE_ENV === "production") {
 
 // Socket.io setup
 const io = require("socket.io")(server, {
-  path: "/socket.io/",
   cors: {
-    origin: ["https://chatter-box-inky.vercel.app", "http://localhost:3000"], // List all frontend URLs
+    origin: "http://localhost:3000", // Adjust for your frontend host
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -84,9 +69,10 @@ io.on("connection", (socket) => {
 
     try {
       const savedMessage = await message.save();
+      // Populate the sender data before sending the message to all clients
       const populatedMessage = await Message.findById(
         savedMessage._id
-      ).populate("sender", "name email _id"); 
+      ).populate("sender", "name email _id"); // Adjust according to what sender info you need
 
       io.to(chatRoomId).emit("newMessage", populatedMessage);
     } catch (error) {
