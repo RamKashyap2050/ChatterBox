@@ -6,37 +6,55 @@ import io from "socket.io-client";
 const socket = io("http://localhost:4004");
 
 function Dashboard() {
-  const [users, setUsers] = useState([]);
+  const [userChats, setUserChats] = useState([]);
   const navigate = useNavigate();
   const { user } = useUser();
 
   useEffect(() => {
-    async function fetchUsers() {
+    async function fetchChatDetails() {
+      if (!user) {
+        console.error("User not logged in");
+        return;
+      }
       try {
-        const response = await axios.get("/Users/getusers");
-        const filteredUsers = response.data.filter(u => u._id !== user.id);
-        setUsers(filteredUsers);
+        // Assume the endpoint returns both users and the last message of their chat
+        const response = await axios.get(`/Chats/withLastMessage/${user.id}`);
+        setUserChats(response.data);
       } catch (error) {
-        console.error("Failed to fetch users", error);
+        console.error("Failed to fetch chat details", error);
       }
     }
-    fetchUsers();
+    fetchChatDetails();
   }, [user]);
-  if (!user) {
-    console.error("User not logged in");
-    // navigate('/login'); // redirect to login page or a suitable page
-    return; // stop further execution
-  }
 
   const handleUserSelect = async (selectedUser) => {
-    if (user.id === selectedUser._id) return; // Prevent creating a chat with oneself
-    try {
-      const response = await axios.post("/Chats/create", {
-        userIds: [user.id, selectedUser._id],
+    if (!selectedUser || !selectedUser._id) {
+      console.error("Selected user data is incomplete:", selectedUser);
+      return;
+    }
+
+    const existingChat = userChats.find(
+      (chat) =>
+        chat.users &&
+        Array.isArray(chat.users) &&
+        chat.users.some((u) => u._id === selectedUser._id)
+    );
+
+    if (existingChat && existingChat.chatRoomId) {
+      navigate(`/dashboard/${existingChat.chatRoomId}`, {
+        state: { selectedUser, chatRoomId: existingChat.chatRoomId },
       });
-      navigate(`/dashboard/${response.data._id}`, { state: { selectedUser } });
-    } catch (error) {
-      console.error("Failed to create chat room", error);
+    } else {
+      try {
+        const response = await axios.post("/Chats/create", {
+          userIds: [user.id, selectedUser._id],
+        });
+        navigate(`/dashboard/${response.data._id}`, {
+          state: { selectedUser },
+        });
+      } catch (error) {
+        console.error("Failed to create chat room", error);
+      }
     }
   };
 
@@ -50,10 +68,10 @@ function Dashboard() {
           borderRight: "1px solid #ccc",
         }}
       >
-        {users.map((userItem) => (
+        {userChats.map((chat) => (
           <div
-            key={userItem._id}
-            onClick={() => handleUserSelect(userItem)}
+            key={chat.user._id}
+            onClick={() => handleUserSelect(chat.user)}
             style={{
               padding: "10px",
               borderBottom: "1px solid #ccc",
@@ -63,7 +81,7 @@ function Dashboard() {
             }}
           >
             <img
-              src={userItem.image}
+              src={chat.user.image}
               alt="avatar"
               style={{
                 width: "50px",
@@ -72,7 +90,34 @@ function Dashboard() {
                 marginRight: "10px",
               }}
             />
-            <span>{userItem.email}</span>
+            <div style={{ width: "100%" }}>
+              <span>{chat.user.email}</span>
+
+              {chat.lastMessage && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <p style={{ fontWeight: "bold", margin: 0 }}>
+                    {chat.lastMessage.content}
+                  </p>
+                  <p style={{ fontWeight: "bold", margin: 0 }}>
+                    {new Date(
+                      chat.lastMessage.createdAt
+                    ).toLocaleDateString() === new Date().toLocaleDateString()
+                      ? new Date(
+                          chat.lastMessage.createdAt
+                        ).toLocaleTimeString()
+                      : new Date(
+                          chat.lastMessage.createdAt
+                        ).toLocaleDateString()}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>
