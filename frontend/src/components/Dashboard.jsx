@@ -91,7 +91,7 @@ function Dashboard() {
               }}
             />
             <div style={{ width: "100%" }}>
-              <span>{chat.user.email}</span>
+              <span>{chat.user.user_name}</span>
 
               {chat.lastMessage && (
                 <div

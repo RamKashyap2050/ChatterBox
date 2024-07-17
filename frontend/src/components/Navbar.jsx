@@ -5,6 +5,7 @@ import {
   Toolbar,
   Typography,
   Button,
+  Avatar,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../UserContext"; // Make sure the path is correct
@@ -18,7 +19,7 @@ const Navbar = () => {
     setUser(null);
     // You might want to make a logout API call or redirect user
     console.log("Logged out");
-    navigate("/login")
+    navigate("/login");
   };
 
   const handleDashboard = () => {
@@ -38,9 +39,13 @@ const Navbar = () => {
           </Typography>
           {user ? (
             <>
-              <Button color="inherit" component={Link} to="/profile">
-                {user.user_name}
-              </Button>
+              <Avatar
+                alt="Remy Sharp"
+                src={user.image}
+                component={Link}
+                to="/profile"
+              />
+
               <Button color="inherit" onClick={handleLogout}>
                 Logout
               </Button>

@@ -85,7 +85,7 @@ function ChatRoom() {
               margin: "20px auto",
               backgroundColor: "#F5F5DC",
               borderRadius: "6px",
-              maxWidth: "10%",
+              maxWidth: "25%",
               alignContent: "center",
               fontWeight: "lighter",
               fontSize: "0.8rem",

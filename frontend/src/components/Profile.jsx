@@ -8,6 +8,7 @@ import {
   Avatar,
   IconButton,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { CameraAlt, Backup, Delete, Block } from "@mui/icons-material";
 import { useUser } from "../UserContext";
@@ -46,7 +47,7 @@ const Profile = () => {
   return (
     <div style={{ maxWidth: 400, margin: "auto", padding: "20px" }}>
       <Card>
-        <CardContent style={{ textAlign: "center" }}>
+        <CardContent style={{ textAlign: "center", position: "relative" }}>
           <Avatar
             alt="User profile"
             src={user?.image}
@@ -59,7 +60,6 @@ const Profile = () => {
               position: "relative",
               top: -150,
               left: 55,
-            //   marginBottom: -50,
             }} // Adjust positioning
           >
             <input
@@ -70,6 +70,18 @@ const Profile = () => {
             />
             <CameraAlt />
           </IconButton>
+          {loading && (
+            <CircularProgress
+              size={40}
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                marginTop: "-20px",
+                marginLeft: "-20px",
+              }}
+            />
+          )}
           <Typography variant="h6">User Name: {user?.user_name}</Typography>
           <Typography color="textSecondary">Email: {user?.email}</Typography>
         </CardContent>
