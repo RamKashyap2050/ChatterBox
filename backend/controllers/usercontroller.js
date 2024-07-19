@@ -3,7 +3,7 @@ const users = require("../models/usermodel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { uploadImageToS3 } = require("../S3/s3");
-
+const chatRoom = require("../models/chatRoom")
 const googlelogin = asynchandler(async (req, res) => {
   console.log("I am Google Login");
 });
@@ -165,9 +165,23 @@ const logout = asynchandler(async (req, res) => {
 });
 
 const getusers = asynchandler(async (req, res) => {
+  const loggedInUserId = req.params.userId;
+  console.log("Reached Get Users")
   try {
-    const allUsers = await users.find({}); // Changed variable name from users to allUsers
-    res.json(allUsers);
+    const allUsers = await users.find({_id: {$ne: loggedInUserId}});
+
+    const hasChatWithUser = {};
+
+    for (const user of allUsers) {
+      const existingChat = await chatRoom.findOne({
+        participants: {$all: [loggedInUserId, user._id]}
+      });
+      hasChatWithUser[user._id] = !!existingChat;
+    }
+
+    const usersToShow = allUsers.filter(user => !hasChatWithUser[user._id]);
+    console.log("Users to Show", usersToShow)
+    res.json(usersToShow);
   } catch (err) {
     res.status(500).json({ message: "Error fetching users", error: err });
   }

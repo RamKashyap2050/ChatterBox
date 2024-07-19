@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../UserContext";
 import axios from "axios";
+import CreateIcon from "@mui/icons-material/Create";
 import io from "socket.io-client";
 const socket = io("http://localhost:4004");
 
@@ -57,6 +58,9 @@ function Dashboard() {
       }
     }
   };
+  const handleCreateNewChat = () => {
+    navigate("/createnewchat");
+  };
 
   return (
     <div className="dashboard">
@@ -68,58 +72,83 @@ function Dashboard() {
           borderRight: "1px solid #ccc",
         }}
       >
-        {userChats.map((chat) => (
-          <div
-            key={chat.user._id}
-            onClick={() => handleUserSelect(chat.user)}
+        {userChats.map(
+          (chat) =>
+            chat.user && (
+              <div
+                key={chat.user?._id}
+                onClick={() => handleUserSelect(chat.user)}
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #ccc",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={chat.user?.image}
+                  alt="avatar"
+                  style={{
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    marginRight: "10px",
+                  }}
+                />
+                <div style={{ width: "100%" }}>
+                  <span>{chat.user?.user_name}</span>
+
+                  {chat?.lastMessage && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <p style={{ fontWeight: "bold", margin: 0 }}>
+                        {chat.lastMessage.content}
+                      </p>
+                      <p style={{ fontWeight: "bold", margin: 0 }}>
+                        {new Date(
+                          chat.lastMessage.createdAt
+                        ).toLocaleDateString() ===
+                        new Date().toLocaleDateString()
+                          ? new Date(
+                              chat.lastMessage.createdAt
+                            ).toLocaleTimeString()
+                          : new Date(
+                              chat.lastMessage.createdAt
+                            ).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            padding: "10px 0", // Add some vertical padding for better spacing
+          }}
+        >
+          <button
+            onClick={handleCreateNewChat}
             style={{
-              padding: "10px",
-              borderBottom: "1px solid #ccc",
+              padding: "10px 20px",
+              background: "white",
+              border: "2px solid black",
+              borderRadius: "10px",
               cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
+              fontWeight:"bold"
             }}
           >
-            <img
-              src={chat.user.image}
-              alt="avatar"
-              style={{
-                width: "50px",
-                height: "50px",
-                borderRadius: "50%",
-                marginRight: "10px",
-              }}
-            />
-            <div style={{ width: "100%" }}>
-              <span>{chat.user.user_name}</span>
-
-              {chat.lastMessage && (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <p style={{ fontWeight: "bold", margin: 0 }}>
-                    {chat.lastMessage.content}
-                  </p>
-                  <p style={{ fontWeight: "bold", margin: 0 }}>
-                    {new Date(
-                      chat.lastMessage.createdAt
-                    ).toLocaleDateString() === new Date().toLocaleDateString()
-                      ? new Date(
-                          chat.lastMessage.createdAt
-                        ).toLocaleTimeString()
-                      : new Date(
-                          chat.lastMessage.createdAt
-                        ).toLocaleDateString()}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+            + Create New Chat
+          </button>
+        </div>
       </div>
     </div>
   );

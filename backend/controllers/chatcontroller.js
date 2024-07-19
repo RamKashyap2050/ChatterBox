@@ -94,15 +94,15 @@ const getlastmessage = asynchandler(async (req, res) => {
       }
 
       // Optionally, add details about the other user in the chat
-      const otherUserId = chatRoom.participants.find((id) => id.toString() !== userId);
+      const otherUserId = chatRoom.participants.find(id => id && userId && id.toString() !== userId.toString());
       if (otherUserId) {
         const otherUser = await users.findById(otherUserId).lean();
+        console.log("I am other user",otherUser)
         chatRoom.user = otherUser; // Append other user details
       }
     }
 
     res.json(chats);
-    console.log("Chats", chats)
   } catch (error) {
     console.error("Failed to fetch chat details", error);
     res.status(500).send("Internal Server Error");

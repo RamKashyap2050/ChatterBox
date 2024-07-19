@@ -18,6 +18,7 @@ import Home from "./components/Home";
 import ChatRoom from "./components/ChatRoom";
 import Navbar from "./components/Navbar";
 import Profile from "./components/Profile";
+import CreateNewChat from "./components/CreateNewChat";
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/dashboard/:chatRoomId" element={<ChatRoom />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/createnewchat" element={<CreateNewChat />} />
           </Routes>
         </Container>
       </Router>

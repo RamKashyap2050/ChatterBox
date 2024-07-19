@@ -16,7 +16,7 @@ router.route("/login/").post(login);
 router.route("/googlelogin/").post(googlelogin);
 router.route("/verify/").get(verifyUser);
 router.route("/logout/").get(logout);
-router.route("/getusers/").get(getusers);
+router.route("/getusers/:userId").get(getusers);
 router.route("/update-profile-image/:userid").put(UpdateProfilePhoto)
 
 module.exports = router;
